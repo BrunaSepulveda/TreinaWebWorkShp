@@ -7,11 +7,26 @@ import {
   ProfissionaisPaper,
   ProfissionaisContainer,
 } from "ui/styles/pages/index.style";
-import { Button, Typography, Container } from "@material-ui/core";
+import {
+  Button,
+  Typography,
+  Container,
+  CircularProgress,
+} from "@material-ui/core";
 import useIndex from "data/hooks/pages/useIndex.pages";
 
 export default function Home() {
-  const { cep, setCep, cepValido } = useIndex();
+  const {
+    cep,
+    setCep,
+    cepValido,
+    buscarProfissionais,
+    erro,
+    diaristas,
+    buscaFeita,
+    carregando,
+    diaristasRestantes,
+  } = useIndex();
 
   return (
     <div>
@@ -32,43 +47,61 @@ export default function Home() {
           onChange={({ target }) => setCep(target.value)}
         />
         <FormElementsContainer>
-          <Typography color={"error"}>CEP inválido</Typography>
+          {erro && (
+            <Typography color={"error"} sx={{ mt: 5 }}>
+              {erro}
+            </Typography>
+          )}
           <Button
             variant={"contained"}
             color={"secondary"}
-            sx={{ width: "220px" }}
+            sx={{ width: "220px", mt: 2 }}
+            disabled={!cepValido || carregando}
+            onClick={() => buscarProfissionais(cep)}
           >
-            Buscar
+            {carregando ? <CircularProgress size={20} /> : "Buscar"}
           </Button>
         </FormElementsContainer>
-        <ProfissionaisPaper>
-          <ProfissionaisContainer>
-            <UserInformation
-              name={"Bruna"}
-              picture={"https://github.com/BrunaSepulveda.png"}
-              rating={3}
-              description={"São Paulo"}
-            />
-            <UserInformation
-              name={"Bruna"}
-              picture={"https://github.com/BrunaSepulveda.png"}
-              rating={3}
-              description={"São Paulo"}
-            />
-            <UserInformation
-              name={"Bruna"}
-              picture={"https://github.com/BrunaSepulveda.png"}
-              rating={3}
-              description={"São Paulo"}
-            />
-            <UserInformation
-              name={"Bruna"}
-              picture={"https://github.com/BrunaSepulveda.png"}
-              rating={3}
-              description={"São Paulo"}
-            />
-          </ProfissionaisContainer>
-        </ProfissionaisPaper>
+        {buscaFeita &&
+          (diaristas.length > 0 ? (
+            <ProfissionaisPaper>
+              <ProfissionaisContainer>
+                {diaristas.map((item, index) => {
+                  return (
+                    <UserInformation
+                      key={index}
+                      name={item.nome_completo}
+                      picture={item.foto_usuario}
+                      rating={item.reputação}
+                      description={item.cidade}
+                    />
+                  );
+                })}
+              </ProfissionaisContainer>
+              <Container sx={{ textAlign: "center" }}>
+                {diaristasRestantes > 0 && (
+                  <Typography sx={{ mt: 5 }}>
+                    ...e mais {diaristasRestantes}{" "}
+                    {diaristasRestantes > 1
+                      ? "profissionais atendem"
+                      : "profissional atende"}
+                    ao seu endereço
+                  </Typography>
+                )}
+                <Button
+                  variant={"contained"}
+                  color={"secondary"}
+                  sx={{ mt: 5 }}
+                >
+                  Contratar um profissional
+                </Button>
+              </Container>
+            </ProfissionaisPaper>
+          ) : (
+            <Typography align={"center"} color={"textPrimary"}>
+              Ainda não temos nenhuma diarista dispnível em sua região
+            </Typography>
+          ))}
       </Container>
     </div>
   );

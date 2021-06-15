@@ -1,5 +1,9 @@
 import axios from "axios";
+const url = "https://ediaristas-workshop.herokuapp.com";
 
 export const ApiService = axios.create({
-  baseURL: "https://ediaristas-workshop.herokuapp.com",
+  baseURL: url,
+  headers: {
+    "Content-Type": "application/json",
+  },
 });
